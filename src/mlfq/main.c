@@ -22,6 +22,10 @@ int main(int argc, char const *argv[])
 		}
 		printf("\n");
 	}
+	//code scheduler
+	
+
+	// realese memory
 
 	input_file_destroy(input_file);
 }
