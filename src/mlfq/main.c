@@ -14,20 +14,25 @@ int main(int argc, char const *argv[])
 	printf("Nombre archivo: %s\n", file_name);
 	printf("Cantidad de procesos: %d\n", input_file->len);
 	printf("Procesos:\n");
-	Node* queue_1;
-			
-	queue_1 = node_init(0);
-	Node* temp;
+	node* queue_1 = NULL;
+	node* temp;	
+
 	for (int i = 0; i < input_file->len; ++i)
 	{
 		for (int j = 0; j < 7; ++j)
 		{
 			printf("%s ", input_file->lines[i][j]);
 		}
-		temp = node_init(i);
-		add_node(queue_1, temp);
-		printf("\n");
+		temp = create_node(input_file->lines[i][0]);
+
+		printf("\ntmep-> process: %s\n", temp -> name);
+		if (queue_1 != NULL){
+			printf("\n queue-> process: %s\n", queue_1 -> name);
+		}
+		queue_1 = add_node(queue_1, temp);
+		printf("-\n");
 	}
+	printf("uwuu");
 	print_list(queue_1);
 	//code scheduler
 
@@ -35,6 +40,6 @@ int main(int argc, char const *argv[])
 	
 
 	// realese memory
-
+	// node_destroy(queue_1);
 	input_file_destroy(input_file);
 }
