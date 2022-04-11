@@ -51,17 +51,15 @@ int main(int argc, char const *argv[])
 	int cycle = 0;
 	printf("Inicia ciclo 0\n");
 	int largo_a;
-	while (cycle <= 100){
+	while (cycle <= 10){
 		//comienzo ciclo
 		//Añado un proceso si tiene que entrar
 		Process* new_process =  startProcess(processes, cycle);
+		printf("ciclo numero: %d\n", cycle);
 		while (new_process != NULL){
-			printf("Primer proceso \n");
+			printf("Entrar lista A proceso %s: \n\n\n\n\n",new_process->name);
 			largo_a = enqueue(queue_a, &new_process);
-			printf("name process %s: \n", new_process->name);
-			// printf("\nFila A tiene %d elementos\n", largo_a);
 			new_process =  startProcess(processes, cycle);
-			printf("LLEGUE");
 		}
 		if (readyProcesses(queue_a)){
 			printf("Procesos esperando en A");
@@ -69,7 +67,7 @@ int main(int argc, char const *argv[])
 		//final ciclo
 		cycle += 1;
 	}
-	
+	printf("Inicia liberacion de memoria\n");
 
 	// realese memory
 	freeQueue(queue_a);

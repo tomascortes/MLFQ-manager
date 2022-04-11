@@ -32,7 +32,6 @@ struct Queue* newQueue()
 int enqueue(struct Queue *q, Process *process)
 {
 	struct Node *node = malloc(sizeof(struct Node));
-   printf("AQUI MUERO");
 	if (node == NULL) {
 		return q->size;
 	}
@@ -63,7 +62,6 @@ Process* dequeue(struct Queue *q)
 
 	Process *process = NULL;
 	struct Node *tmp = NULL;
-   printf("DEQUEUE ");
 	process = q->head->process;
 	tmp = q->head;
 	q->head = q->head->next;
@@ -122,8 +120,7 @@ Process* startProcess(struct Queue *q, int cycle_num){
 	}
 	Process *pro;
 	struct Node *tmp = q->head;
-	int counter = 0;
-	while (counter < q->size) {
+	for (int i =0;i < q->size; i++) {
 		pro = dequeue(q);
 		if (pro->start_cycle == cycle_num){
 			return pro;
@@ -131,7 +128,6 @@ Process* startProcess(struct Queue *q, int cycle_num){
 		else{
 			enqueue(q, pro);
 		}
-		counter ++;
 	}
 	return NULL;
 }
@@ -160,7 +156,6 @@ void freeQueue(struct Queue *q)
 	if (q == NULL) {
 		return;
 	}
-	printf("primera liberacion ok\n");
 
 	while (q->head != NULL) {
 		struct Node *tmp = q->head;
@@ -171,8 +166,6 @@ void freeQueue(struct Queue *q)
 
 		free(tmp);
 	}
-	printf("Termino primera liberacion ok\n");
-
 	if (q->tail != NULL) {
 		// free(&q->tail->process);
 		// free(q->tail);
