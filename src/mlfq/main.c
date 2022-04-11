@@ -42,27 +42,30 @@ int main(int argc, char const *argv[])
 		int largo = 0;
 		largo = enqueue(processes, process);
 		printf("\nProcesses tiene %d elementos\n", largo);
+		printf("\nSe agrega el proceso pid %d \n", process->pid);
 		// enqueue(a, process );
-		
-		printf("-\n");
 	}
 	// print_list(processes);
 	//code scheduler
 	int cycle = 0;
 	printf("Inicia ciclo 0\n");
 	int largo_a;
-	while (cycle <= 10){
+	while (cycle <= 20){
 		//comienzo ciclo
 		//Añado un proceso si tiene que entrar
 		Process* new_process =  startProcess(processes, cycle);
 		printf("ciclo numero: %d\n", cycle);
 		while (new_process != NULL){
-			printf("Entrar lista A proceso %s: \n\n\n\n\n",new_process->name);
-			largo_a = enqueue(queue_a, &new_process);
+			largo_a = enqueue(queue_a, new_process);
+			// printf("Entrar lista A en el puesto %d: \n\n",largo_a);
+			// printf("STATUS %d de proceso \n",new_process->status);
 			new_process =  startProcess(processes, cycle);
 		}
+		// Process* proceso_ready;
+		// proceso_ready = readyProcesses(queue_a);
 		if (readyProcesses(queue_a)){
-			printf("Procesos esperando en A");
+			printf("Ejecutando\n");
+			actualizeCycle(queue_a);
 		}
 		//final ciclo
 		cycle += 1;

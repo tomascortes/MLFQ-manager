@@ -22,7 +22,7 @@ typedef struct Process{
     int used_waits;
     int used_delay;
     int used_s;
-    int status;
+    Status status;
 
     //output
     int cpu_times;
