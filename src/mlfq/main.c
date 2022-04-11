@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
 	// print_list(processes);
 	//code scheduler
 	int cycle = 0;
-	printf("Inicia cilo 0\n");
+	printf("Inicia ciclo 0\n");
 	int largo_a;
 	while (cycle <= 100){
 		//comienzo ciclo
@@ -57,14 +57,15 @@ int main(int argc, char const *argv[])
 		Process* new_process =  startProcess(processes, cycle);
 		while (new_process != NULL){
 			printf("Primer proceso \n");
-			largo_a = enqueue(queue_a, new_process);
+			largo_a = enqueue(queue_a, &new_process);
 			printf("name process %s: \n", new_process->name);
 			// printf("\nFila A tiene %d elementos\n", largo_a);
 			new_process =  startProcess(processes, cycle);
+			printf("LLEGUE");
 		}
-		// if (readyProcesses(queue_a)){
-		// 	printf("Procesos esperando en A");
-		// }
+		if (readyProcesses(queue_a)){
+			printf("Procesos esperando en A");
+		}
 		//final ciclo
 		cycle += 1;
 	}
