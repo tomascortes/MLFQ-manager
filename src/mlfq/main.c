@@ -26,12 +26,16 @@ int main(int argc, char const *argv[])
 	processes = newQueue();
 	finished = newQueue();
 
+	int last_time = -1;
+	int last_index = -1;
+
 	for (int i = 0; i < input_file->len; ++i)
 	{
-		for (int j = 0; j < 7; ++j)
-		{	
-			printf("%s ", input_file->lines[i][j]);
-		}
+		// for (int j = 0; j < 7; ++j)
+		// {	
+		// 	printf("%s ", input_file->lines[i][j]);
+		// }
+		
 		Process *process;
 		process = newProcess(input_file->lines[i][0], atoi(input_file->lines[i][1]), atoi(input_file->lines[i][2]), atoi(input_file->lines[i][3]), atoi(input_file->lines[i][4]), atoi(input_file->lines[i][5]), atoi(input_file->lines[i][6]));
 		//agregar procesos a queue processes
@@ -45,13 +49,16 @@ int main(int argc, char const *argv[])
 	// print_list(processes);
 	//code scheduler
 	int cycle = 0;
+	printf("Inicia cilo 0\n");
+	int largo_a;
 	while (cycle <= 100){
 		//comienzo ciclo
+		//Añado un proceso si tiene que entrar
 		Process* new_process =  startProcess(processes, cycle);
 		while (new_process != NULL){
-			int largo_a;
+			printf("Primer proceso \n");
 			largo_a = enqueue(queue_a, new_process);
-			printf("name process %s: ", new_process->name);
+			printf("name process %s: \n", new_process->name);
 			// printf("\nFila A tiene %d elementos\n", largo_a);
 			new_process =  startProcess(processes, cycle);
 		}

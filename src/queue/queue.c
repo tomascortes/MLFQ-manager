@@ -56,13 +56,13 @@ int enqueue(struct Queue *q, Process *process)
 	return q->size;
 }
 
-void* dequeue(struct Queue *q)
+Process* dequeue(struct Queue *q)
 {
 	if (q->size == 0) {
 		return NULL;
 	}
 
-	void *process = NULL;
+	Process *process = NULL;
 	struct Node *tmp = NULL;
 
 	process = q->head->process;
@@ -121,20 +121,18 @@ Process* startProcess(struct Queue *q, int cycle_num){
 	if (q->head == NULL){
 		return NULL;
 	}
-	struct Node *prev = q->head;
-	struct Node *tmp = q->head->next;
-	while (tmp != NULL) {
-		if (tmp->process->start_cycle == cycle_num) {
-			prev->next = tmp->next;
-			Process *pro = tmp->process;
-			tmp->process = NULL;
-			printf("processs: %s uwu \n",pro->name);
-			printf("cycle: %d uwu \n",cycle_num);
+	Process *pro;
+	struct Node *tmp = q->head;
+	int counter = 0;
+	while (counter < q->size) {
+		pro = dequeue(q);
+		if (pro->start_cycle == cycle_num){
 			return pro;
 		}
-		prev = tmp;
-		tmp = tmp->next;
-		
+		else{
+			enqueue(q, pro);
+		}
+		counter ++;
 	}
 	return NULL;
 }
@@ -163,6 +161,7 @@ void freeQueue(struct Queue *q)
 	if (q == NULL) {
 		return;
 	}
+	printf("primera liberacion ok\n");
 
 	while (q->head != NULL) {
 		struct Node *tmp = q->head;
@@ -173,8 +172,10 @@ void freeQueue(struct Queue *q)
 
 		free(tmp);
 	}
+	printf("Termino primera liberacion ok\n");
 
 	if (q->tail != NULL) {
+		free(q->tail->process);
 		free(q->tail);
 	}
 

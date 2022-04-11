@@ -8,11 +8,9 @@ struct Queue;
 extern struct Queue*
 newQueue();
 
-extern int
-enqueue(struct Queue *q, Process *process);
+int enqueue(struct Queue *q, Process *process);
 
-extern void*
-dequeue(struct Queue *q);
+Process* dequeue(struct Queue *q);
 
 extern void
 freeQueue(struct Queue *q);
