@@ -1,84 +1,182 @@
+#include <stdlib.h>
 #include "queue.h"
-#include "../process/process.h"
-#include <stdio.h>
+//codigo obtenido en https://gist.github.com/rdleon/d569a219c6144c4dfc04366fd6298554
 
-// typedef struct LinkedList *nodo
+static struct Node {
+	Process *process;
+	struct Node *next;
+};
 
-node *create_node(char* nombre){
-    node *newNode = malloc(sizeof(node));
-    newNode->begin = 0;
-    newNode->name = nombre;
-    newNode->next = NULL;
-    return newNode;
+struct Queue {
+	int size;
+	struct Node *head;
+	struct Node *tail;
+};
+
+struct Queue* newQueue()
+{
+	struct Queue *q;
+	q = malloc(sizeof(struct Queue));
+
+	if (q == NULL) {
+		return q;
+	}
+
+	q->size = 0;
+	q->head = NULL;
+	q->tail = NULL;
+
+	return q;
+}
+
+int enqueue(struct Queue *q, Process *process)
+{
+	struct Node *node = malloc(sizeof(struct Node));
+
+	if (node == NULL) {
+		return q->size;
+	}
+
+	node->process = process;
+	node->next = NULL;
+
+	if (q->head == NULL) {
+		q->head = node;
+		q->tail = node;
+		q->size = 1;
+
+		return q->size;
+	}
+
+
+	q->tail->next = node;
+	q->tail = node;
+	q->size += 1;
+
+	return q->size;
+}
+
+void* dequeue(struct Queue *q)
+{
+	if (q->size == 0) {
+		return NULL;
+	}
+
+	void *process = NULL;
+	struct Node *tmp = NULL;
+
+	process = q->head->process;
+	tmp = q->head;
+	q->head = q->head->next;
+	q->size -= 1;
+
+	free(tmp);
+
+	return process;
+}
+
+int readyProcesses(struct Queue *q)
+{
+	//retorna 1 si existe un proceso ready en la cola
+	if (q == NULL) {
+		return 0;
+	}
+
+	struct Node *tmp = q->head;
+	while (tmp != NULL) {
+		if (tmp->process->status == 0) {
+			return 1;
+		}
+		tmp = tmp->next;
+	}
+	return 0;
+}
+
+void actualizeCycle(struct Queue *q)
+{
+	//retorna 1 si existe un proceso ready en la cola
+	if (q == NULL) {
+		return;
+	}
+	struct Node *tmp = q->head;
+	while (tmp != NULL) {
+		if (tmp->process-> status == READY) {
+			tmp->process->waiting_time += 1;
+		}
+		else if (tmp->process-> status == WAITING) {
+			tmp->process->waiting_time += 1;
+			tmp->process-> used_delay += 1;
+		}
+		else if (tmp->process-> status == RUNNING) {
+			tmp->process->used_cycles += 1;
+			tmp->process->used_waits += 1;
+		}
+	}
+
+	return;
 }
 
 
-void print_list(node* first) {
-   node *ptr = first;
-   printf("\n[ \n");
-  //  printf("Nombre: %s \n", first->name);
-   //start from the beginning
-   while(ptr != NULL) {
-      printf("Nombre: %s \n", ptr->name);
-      ptr = ptr->next;
-   }
-   printf(" ]");
+Process* startProcess(struct Queue *q, int cycle_num){
+	if (q->head == NULL){
+		return NULL;
+	}
+	struct Node *prev = q->head;
+	struct Node *tmp = q->head->next;
+	while (tmp != NULL) {
+		if (tmp->process->start_cycle == cycle_num) {
+			prev->next = tmp->next;
+			Process *pro = tmp->process;
+			tmp->process = NULL;
+			printf("processs: %s uwu \n",pro->name);
+			printf("cycle: %d uwu \n",cycle_num);
+			return pro;
+		}
+		prev = tmp;
+		tmp = tmp->next;
+		
+	}
+	return NULL;
 }
-
-void add_node(node* first, node* new_node) {
-   // if (*first ==  NULL){
-   //    first = new_node;
-   //    return;
-   // }
-
-   node *ptr = first;
-   //start from the beginning
-   while(ptr->next != NULL) {
-      ptr = ptr->next;
-   }
-   ptr->next = new_node;
-   return;
-
-}
-
-// Node* node_init(int process)
+// void actualizeS(struct Queue *q)
 // {
-//   // Creo la celda
-//   Node* node = malloc(sizeof(Node));
+// 	//retorna 1 si existe un proceso ready en la cola
+// 	if (q == NULL) {
+// 		return;
+// 	}
+// 	struct Queue *temp = q;
 
-//   // Inicializo sus variables
-//   node -> next = NULL;
-//   node -> process = process;
-
-//   // Retorno la celda
-//   return node;
+// 	while (q->head != NULL) {
+// 		struct Node *tmp = q->head;
+// 		if (tmp->process-> status == READY) {
+// 			tmp->process->s += 1;
+// 		}
+// 		else if (tmp->process-> status == WAITING) {
+// 			tmp->process->s += 1;
+// 		}
+// 	}
+// 	return;
 // }
 
+void freeQueue(struct Queue *q)
+{
+	if (q == NULL) {
+		return;
+	}
 
+	while (q->head != NULL) {
+		struct Node *tmp = q->head;
+		q->head = q->head->next;
+		if (tmp->process != NULL) {
+			free(tmp->process);
+		}
 
-// void print_list(Node* first) {
-//    Node *ptr = first;
-//    while(ptr != NULL) {
-//       printf("Nombre: %d \n", first -> process);
-//       ptr = ptr->next;
-//    }
-// }
+		free(tmp);
+	}
 
-// void add_node(Node *first, Node *new_node) {
-//    Node *ptr = first;
-//    while(ptr -> next != NULL) {
-//       ptr = ptr->next;
-//       printf("Siguente nodo: %d", ptr -> process);
-//    }
-//    printf("Termino de recorrer la lista");
-//    ptr -> next = new_node;
-// }
+	if (q->tail != NULL) {
+		free(q->tail);
+	}
 
-// void node_destroy(Node* node)
-// {
-//   if (node)
-//   {
-//     node_destroy(node -> next);
-//     free(node);
-//   }
-// }
+	free (q);
+}

@@ -14,32 +14,65 @@ int main(int argc, char const *argv[])
 	printf("Nombre archivo: %s\n", file_name);
 	printf("Cantidad de procesos: %d\n", input_file->len);
 	printf("Procesos:\n");
-	node* processes = NULL;
-	node* temp;	
+	struct Queue *queue_a;
+	struct Queue *queue_b;
+	struct Queue *queue_c;
+	struct Queue *processes;
+	struct Queue *finished;
+
+	queue_a = newQueue();
+	queue_b = newQueue();
+	queue_c = newQueue();
+	processes = newQueue();
+	finished = newQueue();
 
 	for (int i = 0; i < input_file->len; ++i)
 	{
 		for (int j = 0; j < 7; ++j)
-		{
+		{	
 			printf("%s ", input_file->lines[i][j]);
 		}
-		temp = create_node(input_file->lines[i][0]);
-
-		if (processes == NULL){
-			processes = temp;
-		}
-		else{
-			add_node(processes, temp);
-		}
+		Process *process;
+		process = newProcess(input_file->lines[i][0], atoi(input_file->lines[i][1]), atoi(input_file->lines[i][2]), atoi(input_file->lines[i][3]), atoi(input_file->lines[i][4]), atoi(input_file->lines[i][5]), atoi(input_file->lines[i][6]));
+		//agregar procesos a queue processes
+		int largo = 0;
+		largo = enqueue(processes, process);
+		printf("\nProcesses tiene %d elementos\n", largo);
+		// enqueue(a, process );
+		
 		printf("-\n");
 	}
-	print_list(processes);
+	// print_list(processes);
 	//code scheduler
-
-	
+	int cycle = 0;
+	while (cycle <= 100){
+		//comienzo ciclo
+		Process* new_process =  startProcess(processes, cycle);
+		while (new_process != NULL){
+			int largo_a;
+			largo_a = enqueue(queue_a, new_process);
+			printf("name process %s: ", new_process->name);
+			// printf("\nFila A tiene %d elementos\n", largo_a);
+			new_process =  startProcess(processes, cycle);
+		}
+		// if (readyProcesses(queue_a)){
+		// 	printf("Procesos esperando en A");
+		// }
+		//final ciclo
+		cycle += 1;
+	}
 	
 
 	// realese memory
-	// node_destroy(queue_1);
+	freeQueue(queue_a);
+	printf("A");
+	freeQueue(queue_b);
+	printf("B");
+	freeQueue(queue_c);
+	printf("C");
+	freeQueue(processes);
+	printf("D");
+	freeQueue(finished);
+	printf("E");
 	input_file_destroy(input_file);
 }

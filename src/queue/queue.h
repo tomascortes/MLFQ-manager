@@ -1,32 +1,22 @@
 #pragma once
+#ifndef __SIMPLE_QUEUE__
+#define __SIMPLE_QUEUE__
 #include "../process/process.h"
 
+struct Queue;
 
-typedef struct node{
-    int begin;
-    char* name;
-    struct node *next; 
-}node;
+extern struct Queue*
+newQueue();
 
-/** Nodo de ligada de objetos en una celda */
-// typedef struct node
-// {
-//   struct node* next;
-//   int process;
-// } Node;
+extern int
+enqueue(struct Queue *q, Process *process);
 
+extern void*
+dequeue(struct Queue *q);
 
+extern void
+freeQueue(struct Queue *q);
 
-// typedef struct Queue
-// {
-//   Node * node;
-// } Queue;
+extern int readyProcesses(struct Queue *q);
 
-// Node * node_init(int process);
-// void node_destroy(Node* node);
-// void print_list(Node* first);
-// void add_node(Node* first, Node* new_node);
-
-node* create_node(char* nombre);
-void print_list(node* first);
-void add_node(node* first, node* new_node);
+#endif
