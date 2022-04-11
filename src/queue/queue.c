@@ -25,11 +25,11 @@ void print_list(node* first) {
    printf(" ]");
 }
 
-node* add_node(node* first, node* new_node) {
-   if (first ==  NULL){
-      first = new_node;
-      return new_node;
-   }
+void add_node(node* first, node* new_node) {
+   // if (*first ==  NULL){
+   //    first = new_node;
+   //    return;
+   // }
 
    node *ptr = first;
    //start from the beginning
@@ -37,7 +37,7 @@ node* add_node(node* first, node* new_node) {
       ptr = ptr->next;
    }
    ptr->next = new_node;
-   return first;
+   return;
 
 }
 

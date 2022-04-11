@@ -29,4 +29,4 @@ typedef struct node{
 
 node* create_node(char* nombre);
 void print_list(node* first);
-node* add_node(node* first, node* new_node);
+void add_node(node* first, node* new_node);

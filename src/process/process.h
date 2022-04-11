@@ -9,7 +9,7 @@ typedef enum
 
 typedef struct Process{
     int pid;
-    char name[32]; 
+    char* name; 
     Status status; 
     int cpu_usage_rounds;
     int interruptions;
