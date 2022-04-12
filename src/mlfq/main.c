@@ -26,59 +26,41 @@ int main(int argc, char const *argv[])
 	processes = newQueue();
 	finished = newQueue();
 
-	int last_time = -1;
-	int last_index = -1;
 
+	Process *process;
 	for (int i = 0; i < input_file->len; ++i)
 	{
-		// for (int j = 0; j < 7; ++j)
-		// {	
-		// 	printf("%s ", input_file->lines[i][j]);
-		// }
-		
-		Process *process;
 		process = newProcess(input_file->lines[i][0], atoi(input_file->lines[i][1]), atoi(input_file->lines[i][2]), atoi(input_file->lines[i][3]), atoi(input_file->lines[i][4]), atoi(input_file->lines[i][5]), atoi(input_file->lines[i][6]));
 		//agregar procesos a queue processes
-		int largo = 0;
-		largo = enqueue(processes, process);
-		printf("\nProcesses tiene %d elementos\n", largo);
-		// enqueue(a, process );
-		
-		printf("-\n");
+		enqueue(processes, process);
+		printf("Creado: %s\n", process->name);
+		// printf("Verificando: %s\n", *processes->head->name);
+
 	}
-	// print_list(processes);
 	//code scheduler
 	int cycle = 0;
 	printf("Inicia ciclo 0\n");
-	int largo_a;
+	printQueue(processes);
+	Process* new_process;
 	while (cycle <= 10){
 		//comienzo ciclo
 		//Añado un proceso si tiene que entrar
-		Process* new_process =  startProcess(processes, cycle);
-		printf("ciclo numero: %d\n", cycle);
+		new_process = startProcess(processes, cycle);
+
 		while (new_process != NULL){
-			printf("Entrar lista A proceso %s: \n\n\n\n\n",new_process->name);
-			largo_a = enqueue(queue_a, &new_process);
+			printf("\nEntra a la lista A el proceso %s: \n", new_process->name);
+			enqueue(queue_a, new_process);
 			new_process =  startProcess(processes, cycle);
-		}
-		if (readyProcesses(queue_a)){
-			printf("Procesos esperando en A");
 		}
 		//final ciclo
 		cycle += 1;
 	}
-	printf("Inicia liberacion de memoria\n");
-
 	// realese memory
+	printf("Inicia liberacion de memoria\n");
 	freeQueue(queue_a);
-	printf("A");
 	freeQueue(queue_b);
-	printf("B");
 	freeQueue(queue_c);
-	printf("C");
 	freeQueue(processes);
-	printf("D");
 	freeQueue(finished);
-	printf("E");
 	input_file_destroy(input_file);
 }

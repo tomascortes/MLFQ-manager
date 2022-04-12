@@ -1,4 +1,3 @@
-#pragma once
 #ifndef __SIMPLE_QUEUE__
 #define __SIMPLE_QUEUE__
 #include "../process/process.h"
@@ -17,4 +16,5 @@ freeQueue(struct Queue *q);
 
 extern int readyProcesses(struct Queue *q);
 
+void printQueue(struct Queue *q);
 #endif
