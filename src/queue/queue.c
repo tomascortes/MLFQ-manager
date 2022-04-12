@@ -60,14 +60,14 @@ Process* dequeue(struct Queue *q)
 		return NULL;
 	}
 
-	Process *process = NULL;
+	Process *process;
 	struct Node *tmp = NULL;
 	process = q->head->process;
 	tmp = q->head;
 	q->head = q->head->next;
 	q->size -= 1;
-
-	// free(tmp);
+	tmp -> process = NULL;
+	free(tmp);
 
 	return process;
 }
@@ -163,6 +163,21 @@ Process* startProcess(struct Queue *q, int cycle_num){
 	}
 	return NULL;
 }
+
+void printQueue(struct Queue *q){
+	if (q->head == NULL){
+		printf("[]");
+		return;
+	}
+	printf("[");
+	struct Node *tmp = q->head;
+	for (int i =0;i < q->size; i++) {
+		printf("name: %s, ",tmp->process->name);
+		printf("pid: %d, ",tmp->process->pid);
+		tmp = tmp->next;
+	}
+	return;
+}
 // void actualizeS(struct Queue *q)
 // {
 // 	//retorna 1 si existe un proceso ready en la cola
@@ -186,22 +201,16 @@ Process* startProcess(struct Queue *q, int cycle_num){
 void freeQueue(struct Queue *q)
 {
 	if (q == NULL) {
+		free(q);
 		return;
 	}
-
-	while (q->head != NULL) {
-		struct Node *tmp = q->head;
-		q->head = q->head->next;
-		if (tmp->process != NULL) {
-			free(tmp->process);
-		}
-
+	Process *tmp = dequeue(q);
+	while (tmp != NULL)
+	{
 		free(tmp);
+		tmp = dequeue(q);
 	}
-	if (q->tail != NULL) {
-		// free(&q->tail->process);
-		// free(q->tail);
-	}
-
-	free (q);
+	free(q);
 }
+
+
