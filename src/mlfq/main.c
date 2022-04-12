@@ -54,6 +54,7 @@ int main(int argc, char const *argv[])
 			printf("\nEntra a la lista A el proceso %s: \n", new_process->name);
 			enqueue(queue_a, new_process);
 			new_process =  startProcess(processes, cycle);
+		}
 
 		if (readyProcesses(queue_a)){
 			printf("Ejecutando\n");
