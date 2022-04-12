@@ -50,19 +50,15 @@ int main(int argc, char const *argv[])
 	int cycle = 0;
 	printf("Inicia ciclo 0\n");
 	int largo_a;
-	while (cycle <= 20){
+	while (cycle <= 70){
 		//comienzo ciclo
 		//Añado un proceso si tiene que entrar
 		Process* new_process =  startProcess(processes, cycle);
 		printf("ciclo numero: %d\n", cycle);
 		while (new_process != NULL){
 			largo_a = enqueue(queue_a, new_process);
-			// printf("Entrar lista A en el puesto %d: \n\n",largo_a);
-			// printf("STATUS %d de proceso \n",new_process->status);
 			new_process =  startProcess(processes, cycle);
 		}
-		// Process* proceso_ready;
-		// proceso_ready = readyProcesses(queue_a);
 		if (readyProcesses(queue_a)){
 			printf("Ejecutando\n");
 			actualizeCycle(queue_a);
