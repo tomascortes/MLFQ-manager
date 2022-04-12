@@ -78,15 +78,26 @@ int readyProcesses(struct Queue *q)
 	if (q == NULL) {
 		return 0;
 	}
-
+   
 	struct Node *tmp = q->head;
 	while (tmp != NULL) {
-		if (tmp->process->status == READY) {
+        if (tmp->process->status == 3) {
+         // process2 = &tmp->process;
 			return 1;
 		}
 		tmp = tmp->next;
 	}
-	return 0;
+	tmp = q->head;
+	while (tmp != NULL){
+		if (tmp->process->status == 0) {
+         	// process2 = &tmp->process;
+         	tmp->process->status = 3;
+         	printf("Proceso %d cambia a status %d\n", tmp->process->pid, tmp->process->status);
+			return 1;
+		}
+		tmp = tmp->next;
+	}
+	return 1;
 }
 
 void actualizeCycle(struct Queue *q)
@@ -99,15 +110,36 @@ void actualizeCycle(struct Queue *q)
 	while (tmp != NULL) {
 		if (tmp->process-> status == READY) {
 			tmp->process->waiting_time += 1;
+         	printf("Proceso %d tiene waiting_time de %d ciclos \n", tmp->process->pid, tmp->process->waiting_time);
 		}
 		else if (tmp->process-> status == WAITING) {
 			tmp->process->waiting_time += 1;
-			tmp->process-> used_delay += 1;
+			tmp->process->used_delay += 1;
+			printf("Proceso %d tiene waiting_time de %d ciclos \n", tmp->process->pid, tmp->process->waiting_time);
+			if (tmp->process->used_delay >= tmp->process->wait_delay){
+				printf("Proceso %d entra en estado READY \n", tmp->process->pid);
+				tmp->process->status = 0;
+				tmp->process->used_waits = 0;
+			}
 		}
 		else if (tmp->process-> status == RUNNING) {
-			tmp->process->used_cycles += 1;
-			tmp->process->used_waits += 1;
+			if (tmp->process->used_waits < tmp->process->wait){
+				tmp->process->used_cycles += 1;
+				tmp->process->used_waits += 1;
+				printf("Proceso %d avanzo en %d ciclos \n", tmp->process->pid, tmp->process->used_cycles);
+			}
+			else if (tmp->process->used_cycles < tmp->process->cycles) {
+				printf("Proceso %d entra en wait tras %d ciclos \n", tmp->process->pid, tmp->process->used_waits);
+				tmp->process->status = 1;
+				tmp->process->waiting_time += 1;
+				tmp->process->used_delay += 1;
+			}
+			else {
+				printf("Proceso %d termina tras %d ciclos \n", tmp->process->pid, tmp->process->used_cycles);
+				tmp->process->status = 2;
+			}
 		}
+      tmp = tmp->next;
 	}
 
 	return;

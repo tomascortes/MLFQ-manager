@@ -32,26 +32,34 @@ int main(int argc, char const *argv[])
 	{
 		process = newProcess(input_file->lines[i][0], atoi(input_file->lines[i][1]), atoi(input_file->lines[i][2]), atoi(input_file->lines[i][3]), atoi(input_file->lines[i][4]), atoi(input_file->lines[i][5]), atoi(input_file->lines[i][6]));
 		//agregar procesos a queue processes
+
 		enqueue(processes, process);
 		printf("Creado: %s\n", process->name);
 		// printf("Verificando: %s\n", *processes->head->name);
-
 	}
 	//code scheduler
 	int cycle = 0;
 	printf("Inicia ciclo 0\n");
+
 	printQueue(processes);
 	Process* new_process;
-	while (cycle <= 10){
+
+	while (cycle <= 70){
 		//comienzo ciclo
 		//Añado un proceso si tiene que entrar
 		new_process = startProcess(processes, cycle);
 
 		while (new_process != NULL){
+
 			printf("\nEntra a la lista A el proceso %s: \n", new_process->name);
 			enqueue(queue_a, new_process);
 			new_process =  startProcess(processes, cycle);
+
+		if (readyProcesses(queue_a)){
+			printf("Ejecutando\n");
+			actualizeCycle(queue_a);
 		}
+
 		//final ciclo
 		cycle += 1;
 	}
