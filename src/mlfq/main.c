@@ -65,6 +65,22 @@ int main(int argc, char const *argv[])
 		//final ciclo
 		cycle += 1;
 	}
+	//Write csv
+	FILE *fpt;
+	fpt = fopen(argv[2], "w+");
+	Process *temp;
+	while (finished->size != 0){
+		temp = dequeue(finished);
+		fprintf(fpt,"%s, %d, %d, %d, %d, %d\n", 
+		temp->name, 
+		temp->cpu_times, 
+		temp->interrupted_times, 
+		temp->turnaround_time, 
+		temp->response_time, 
+		temp->waiting_time);
+	}
+
+
 	// realese memory
 	printf("Inicia liberacion de memoria\n");
 	freeQueue(queue_a);
