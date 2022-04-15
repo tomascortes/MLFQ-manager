@@ -3,16 +3,9 @@
 #include "queue.h"
 //codigo obtenido en https://gist.github.com/rdleon/d569a219c6144c4dfc04366fd6298554
 
-static struct Node {
-	Process *process;
-	struct Node *next;
-};
 
-struct Queue {
-	int size;
-	struct Node *head;
-	struct Node *tail;
-};
+
+
 
 struct Queue* newQueue()
 {

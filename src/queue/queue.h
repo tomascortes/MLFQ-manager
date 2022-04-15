@@ -2,10 +2,16 @@
 #define __SIMPLE_QUEUE__
 #include "../process/process.h"
 
-struct Queue;
-
-extern struct Queue*
-newQueue();
+static struct Node {
+	Process *process;
+	struct Node *next;
+};
+struct Queue {
+	int size;
+	struct Node *head;
+	struct Node *tail;
+};
+extern struct Queue* newQueue();
 
 int enqueue(struct Queue *q, Process *process);
 
