@@ -65,13 +65,13 @@ Process* dequeue(struct Queue *q)
 	return process;
 }
 
-int readyProcesses(struct Queue *q)
+int readyProcesses(struct Queue *q, int cycle)
 {
 	//retorna 1 si existe un proceso ready en la cola
 	if (q == NULL) {
 		return 0;
 	}
-   
+
 	struct Node *tmp = q->head;
 	while (tmp != NULL) {
         if (tmp->process->status == RUNNING) {
@@ -85,8 +85,12 @@ int readyProcesses(struct Queue *q)
 	while (tmp != NULL){
 		if (tmp->process->status == READY) {
          	tmp->process->status = RUNNING;
-         	printf("Proceso %d cambia a status %d\n", tmp->process->pid, tmp->process->status);
 			q->running = 1;
+			tmp->process->cpu_times += 1;
+			if (tmp->process->response_time == 0){
+				tmp->process->response_time += cycle;
+				tmp->process->response_time -= tmp->process->start_cycle;
+			}
 			return 1;
 		}
 		tmp = tmp->next;
@@ -103,18 +107,15 @@ void actualizeCycle(struct Queue *q)
 	while (tmp != NULL) {
 		if (tmp->process-> status == READY) {
 			tmp->process->waiting_time += 1;
-         	printf("Proceso %d tiene waiting_time de %d ciclos \n", tmp->process->pid, tmp->process->waiting_time);
 		}
 		else if (tmp->process-> status == WAITING) {
 			tmp->process->waiting_time += 1;
 			tmp->process->used_delay += 1;
-			printf("Proceso %d tiene waiting_time de %d ciclos \n", tmp->process->pid, tmp->process->waiting_time);
 		}
 		else if (tmp->process-> status == RUNNING) {
 			tmp->process->used_cycles += 1;
 			tmp->process->used_waits += 1;
 			tmp->process->quantum += 1;
-			printf("Proceso %d avanzo en %d ciclos \n", tmp->process->pid, tmp->process->used_cycles);
 		}
       tmp = tmp->next;
 	}
@@ -122,7 +123,7 @@ void actualizeCycle(struct Queue *q)
 	return;
 }
 
-void actualizeRunning(struct Queue *q_now, struct Queue *q_next,struct Queue *finished, int quantum){
+void actualizeRunning(struct Queue *q_now, struct Queue *q_next,struct Queue *finished, int quantum, int cycle){
 	if (q_now->head == NULL){
 		return;
 	}
@@ -134,27 +135,24 @@ void actualizeRunning(struct Queue *q_now, struct Queue *q_next,struct Queue *fi
 		if (node->process->status == RUNNING){
 			// ver si termino
 			if (node->process->used_cycles >= node->process->cycles) {
-				printf("Proceso %d termina tras %d ciclos \n", node->process->pid, node->process->used_cycles);
 				node->process->status = FINISHED;
+				node->process->turnaround_time = cycle - node->process->start_cycle;
 				enqueue(finished, node->process);
 				q_now->running = 0;
 				// sacar proceso
 				if (prev_node!= NULL){
 					prev_node->next = node->next;
 					q_now ->size -= 1;
-					printf("Elimine el proceso de la fila\n");
 				}
 				else{
 					q_now->head = node->next;
 					q_now->size -=1;
-					printf("El siguiente nodo es %s \n", node->next);
 				}
 				free(node);
 
 			}
 			//ver si le toca wait
 			else if (node->process->used_waits >= node->process->wait){
-				printf("Proceso %d entra en wait tras %d ciclos \n", node->process->pid, node->process->used_waits);
 				node->process->status = WAITING;
 				q_now->running = 0;
 				node->process->used_waits = 0;
@@ -172,6 +170,9 @@ void actualizeRunning(struct Queue *q_now, struct Queue *q_next,struct Queue *fi
 				else{
 					prev_node->next = node->next;
 					q_now->size -= 1;
+					if (node->next == NULL){
+						q_now -> tail = prev_node;
+					}
 					enqueue(q_next, node->process);
 					free(node);
 				}
@@ -195,11 +196,9 @@ void actualizeWaits(struct Queue *q)
 	while (tmp != NULL) {
 		if (tmp->process-> status == WAITING) {
 			if (tmp->process->used_delay == tmp->process->wait_delay){
-				printf("Proceso %d entra en estado READY \n", tmp->process->pid);
 				tmp->process->status = READY;
 				tmp->process->used_waits = 0;
 			}
-			printf("Proceso %s, necesita %d tiempo, lleva %d\n", tmp->process->name, tmp->process->wait_delay, tmp->process->used_delay);
 		}
 
       tmp = tmp->next;
@@ -227,40 +226,45 @@ Process* startProcess(struct Queue *q, int cycle_num){
 }
 
 
-
-void printQueue(struct Queue *q){
-	if (q->head == NULL){
-		printf("[]");
+void actualizeS(struct Queue *queue_a, struct Queue *queue_now)
+{
+	//retorna 1 si existe un proceso ready en la cola
+	if (queue_now->head == NULL) {
 		return;
 	}
-	printf("[");
-	struct Node *tmp = q->head;
-	for (int i =0;i < q->size; i++) {
-		printf("name: %s, ",tmp->process->name);
-		printf("pid: %d, ",tmp->process->pid);
-		tmp = tmp->next;
+	struct Node *node = queue_now->head;
+	struct Node *prev_node = NULL;
+
+	while (node != NULL) {
+		if (node->process-> status == READY || node->process-> status == WAITING) {
+			node->process->used_s += 1;
+			if  (node->process-> used_s >= node->process->s){
+				if (prev_node == NULL){
+					node->process->used_s = 0;
+					enqueue(queue_a, dequeue(queue_now));
+					node = queue_now->head;
+				}
+				else{
+					prev_node->next = node->next;
+					queue_now ->size -= 1;
+					if (node->next == NULL){
+						queue_now -> tail = prev_node;
+					}
+					node->process->used_s = 0;
+					enqueue(queue_a, node->process);
+					free(node);
+					node = prev_node->next;
+				}
+			}
+		}
+		if (node == NULL){
+			return;
+		}
+		prev_node = node;
+		node = node->next;//acaa
 	}
 	return;
 }
-// void actualizeS(struct Queue *q)
-// {
-// 	//retorna 1 si existe un proceso ready en la cola
-// 	if (q == NULL) {
-// 		return;
-// 	}
-// 	struct Queue *temp = q;
-
-// 	while (q->head != NULL) {
-// 		struct Node *tmp = q->head;
-// 		if (tmp->process-> status == READY) {
-// 			tmp->process->s += 1;
-// 		}
-// 		else if (tmp->process-> status == WAITING) {
-// 			tmp->process->s += 1;
-// 		}
-// 	}
-// 	return;
-// }
 
 void freeQueue(struct Queue *q)
 {

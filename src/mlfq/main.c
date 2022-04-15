@@ -13,7 +13,6 @@ int main(int argc, char const *argv[])
 	/*Mostramos el archivo de input en consola*/
 	printf("Nombre archivo: %s\n", file_name);
 	printf("Cantidad de procesos: %d\n", input_file->len);
-	printf("Procesos:\n");
 	struct Queue *queue_a;
 	struct Queue *queue_b;
 	struct Queue *queue_c;
@@ -40,10 +39,8 @@ int main(int argc, char const *argv[])
 	//code scheduler
 	int cycle = 0;
 	int quantum = atoi(argv[3]);
-	printf("Inicia ciclo 0\n");
 	printf("El quantum es %d\n", quantum);
 
-	printQueue(processes);
 	Process* new_process;
 
 	int running = 0;
@@ -54,42 +51,33 @@ int main(int argc, char const *argv[])
 		//Añado un proceso si tiene que entrar
 		new_process = startProcess(processes, cycle);
 		while (new_process != NULL){
-			printf("\nEntra a la lista A el proceso %s: \n", new_process->name);
 			enqueue(queue_a, new_process);
 			new_process =  startProcess(processes, cycle);
 		}
+		// Revisar si deben volver a la cola A
+		actualizeS(queue_a, queue_b);
+		actualizeS(queue_a, queue_c);
 		// revisar waitings finished y quantum 
-		// printf("Cola A procesando %d size %d\n", queue_a->running, queue_a->size);
-		// printf("Cola B procesando %d size %d\n", queue_b->running, queue_b->size);
-		// printf("Cola C procesando %d size %d\n", queue_c->running, queue_c->size);
-		// printf("Cola finished procesando %d size %d\n", finished->running, finished->size);
-		actualizeRunning(queue_a, queue_b,finished, quantum*2);
-		actualizeRunning(queue_b, queue_c,finished, quantum);
-		actualizeRunning(queue_c, queue_c,finished, 100000); //hardcodeado para despues
+		actualizeRunning(queue_a, queue_b,finished, quantum*2, cycle);
+		actualizeRunning(queue_b, queue_c,finished, quantum, cycle);
+		actualizeRunning(queue_c, queue_c,finished, 100000, cycle); //hardcodeado para despues
 		actualizeWaits(queue_a);
 		actualizeWaits(queue_b);
 		actualizeWaits(queue_c);
+	 	// Pasar procesos de READY a RUNNING
+		if (!(queue_a->running || queue_b->running || queue_c->running)){
 
-		if (queue_a->running || queue_b->running || queue_c->running){
-			
-		}
-		else
-		{
-			if (readyProcesses(queue_a)){
-			// printf("Empezamos a ejecutar cola A\n");
-			}
-			else if (readyProcesses(queue_b)){
-				// printf("Empezamos a ejecutar cola B\n");
-			}
-			else if (readyProcesses(queue_c)){
-				// printf("Empezamos a ejecutar cola C\n");
+			if (!(readyProcesses(queue_a, cycle))){
+				if (!(readyProcesses(queue_b, cycle))){
+					readyProcesses(queue_c, cycle);
+				}
 			}
 		}
-
 		// 
 		actualizeCycle(queue_a);
 		actualizeCycle(queue_b);
 		actualizeCycle(queue_c);
+		
 		
 		//final ciclo
 		cycle += 1;
@@ -100,7 +88,7 @@ int main(int argc, char const *argv[])
 	Process *temp;
 	while (finished->size != 0){
 		temp = dequeue(finished);
-		fprintf(fpt,"%s, %d, %d, %d, %d, %d\n", 
+		fprintf(fpt,"%s,%d,%d,%d,%d,%d\n", 
 		temp->name, 
 		temp->cpu_times, 
 		temp->interrupted_times, 
@@ -109,7 +97,7 @@ int main(int argc, char const *argv[])
 		temp->waiting_time);
 		free(temp);
 	}
-
+	printf("Ejecuciones terminadas exitosamente\n");
 
 	// realese memory
 	printf("Inicia liberacion de memoria\n");
