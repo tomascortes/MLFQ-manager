@@ -101,13 +101,14 @@ int readyProcesses(struct Queue *q)
 	return 1;
 }
 
-void actualizeCycle(struct Queue *q)
+void actualizeCycle(struct Queue *q, struct Queue *finished)
 {
 	//retorna 1 si existe un proceso ready en la cola
 	if (q == NULL) {
 		return;
 	}
 	struct Node *tmp = q->head;
+	struct Node *tmp2 = finished->head;
 	while (tmp != NULL) {
 		if (tmp->process-> status == READY) {
 			tmp->process->waiting_time += 1;
@@ -138,6 +139,13 @@ void actualizeCycle(struct Queue *q)
 			else {
 				printf("Proceso %d termina tras %d ciclos \n", tmp->process->pid, tmp->process->used_cycles);
 				tmp->process->status = 2;
+				enqueue(finished, tmp->process);
+				// tmp2 = finished->head;
+				// while (tmp2 != NULL){
+				// 	printf("Proceso %d termino \n", tmp2->process->pid);
+				// 	tmp2 = tmp2->next;
+				// }
+
 			}
 		}
       tmp = tmp->next;

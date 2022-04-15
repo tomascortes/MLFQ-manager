@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
 	printQueue(processes);
 	Process* new_process;
 
-	while (cycle <= 70){
+	while (finished->size <= processes->size){
 		//comienzo ciclo
 		//Añado un proceso si tiene que entrar
 		new_process = startProcess(processes, cycle);
@@ -58,9 +58,10 @@ int main(int argc, char const *argv[])
 
 		if (readyProcesses(queue_a)){
 			printf("Ejecutando\n");
-			actualizeCycle(queue_a);
+			actualizeCycle(queue_a, finished);
 		}
 
+		
 		//final ciclo
 		cycle += 1;
 	}
