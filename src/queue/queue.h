@@ -17,4 +17,6 @@ freeQueue(struct Queue *q);
 extern int readyProcesses(struct Queue *q);
 
 void printQueue(struct Queue *q);
+
+Process* startProcess(struct Queue *q, int cycle_num);
 #endif
