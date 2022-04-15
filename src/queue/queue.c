@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "queue.h"
 //codigo obtenido en https://gist.github.com/rdleon/d569a219c6144c4dfc04366fd6298554
 
@@ -151,7 +152,6 @@ Process* startProcess(struct Queue *q, int cycle_num){
 		return NULL;
 	}
 	Process *pro;
-	struct Node *tmp = q->head;
 	for (int i =0;i < q->size; i++) {
 		pro = dequeue(q);
 		if (pro->start_cycle == cycle_num){
