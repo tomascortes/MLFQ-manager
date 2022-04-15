@@ -31,6 +31,7 @@ Process* newProcess(
     pro -> used_delay = 0;
     pro -> used_s = 0;
     pro -> status = READY;
+    pro -> quantum = 0;
 
     //output
     pro -> cpu_times = 0;

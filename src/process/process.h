@@ -23,6 +23,7 @@ typedef struct Process{
     int used_delay;
     int used_s;
     Status status;
+    int quantum;
 
     //output
     int cpu_times;

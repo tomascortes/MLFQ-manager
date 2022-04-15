@@ -39,14 +39,18 @@ int main(int argc, char const *argv[])
 	}
 	//code scheduler
 	int cycle = 0;
+	int quantum = atoi(argv[3]);
 	printf("Inicia ciclo 0\n");
+	printf("El quantum es %d\n", quantum);
 
 	printQueue(processes);
 	Process* new_process;
 
+	int running = 0;
+
+
 	while (finished->size < input_file->len){
 		//comienzo ciclo
-
 		//Añado un proceso si tiene que entrar
 		new_process = startProcess(processes, cycle);
 		while (new_process != NULL){
@@ -54,16 +58,38 @@ int main(int argc, char const *argv[])
 			enqueue(queue_a, new_process);
 			new_process =  startProcess(processes, cycle);
 		}
-		
-		if (readyProcesses(queue_a)){
-			printf("Ejecutando\n");
-			actualizeCycle(queue_a, finished);
+		// revisar waitings finished y quantum 
+		// printf("Cola A procesando %d size %d\n", queue_a->running, queue_a->size);
+		// printf("Cola B procesando %d size %d\n", queue_b->running, queue_b->size);
+		// printf("Cola C procesando %d size %d\n", queue_c->running, queue_c->size);
+		// printf("Cola finished procesando %d size %d\n", finished->running, finished->size);
+		actualizeRunning(queue_a, queue_b,finished, quantum*2);
+		actualizeRunning(queue_b, queue_c,finished, quantum);
+		actualizeRunning(queue_c, queue_c,finished, 100000); //hardcodeado para despues
+		actualizeWaits(queue_a);
+		actualizeWaits(queue_b);
+		actualizeWaits(queue_c);
+
+		if (queue_a->running || queue_b->running || queue_c->running){
+			
 		}
-		else{
-			printf("Ejecutando\n");
-			actualizeCycle(queue_a, finished);
+		else
+		{
+			if (readyProcesses(queue_a)){
+			// printf("Empezamos a ejecutar cola A\n");
+			}
+			else if (readyProcesses(queue_b)){
+				// printf("Empezamos a ejecutar cola B\n");
+			}
+			else if (readyProcesses(queue_c)){
+				// printf("Empezamos a ejecutar cola C\n");
+			}
 		}
 
+		// 
+		actualizeCycle(queue_a);
+		actualizeCycle(queue_b);
+		actualizeCycle(queue_c);
 		
 		//final ciclo
 		cycle += 1;
@@ -81,11 +107,13 @@ int main(int argc, char const *argv[])
 		temp->turnaround_time, 
 		temp->response_time, 
 		temp->waiting_time);
+		free(temp);
 	}
 
 
 	// realese memory
 	printf("Inicia liberacion de memoria\n");
+	
 	freeQueue(queue_a);
 	freeQueue(queue_b);
 	freeQueue(queue_c);
