@@ -44,19 +44,22 @@ int main(int argc, char const *argv[])
 	printQueue(processes);
 	Process* new_process;
 
-	while (finished->size <= processes->size){
+	while (finished->size < input_file->len){
 		//comienzo ciclo
+
 		//Añado un proceso si tiene que entrar
 		new_process = startProcess(processes, cycle);
-
 		while (new_process != NULL){
-
 			printf("\nEntra a la lista A el proceso %s: \n", new_process->name);
 			enqueue(queue_a, new_process);
 			new_process =  startProcess(processes, cycle);
 		}
-
+		
 		if (readyProcesses(queue_a)){
+			printf("Ejecutando\n");
+			actualizeCycle(queue_a, finished);
+		}
+		else{
 			printf("Ejecutando\n");
 			actualizeCycle(queue_a, finished);
 		}

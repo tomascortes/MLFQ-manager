@@ -113,7 +113,7 @@ void actualizeCycle(struct Queue *q, struct Queue *finished)
 			printf("Proceso %d tiene waiting_time de %d ciclos \n", tmp->process->pid, tmp->process->waiting_time);
 			if (tmp->process->used_delay >= tmp->process->wait_delay){
 				printf("Proceso %d entra en estado READY \n", tmp->process->pid);
-				tmp->process->status = 0;
+				tmp->process->status = READY;
 				tmp->process->used_waits = 0;
 			}
 		}
@@ -125,13 +125,13 @@ void actualizeCycle(struct Queue *q, struct Queue *finished)
 			}
 			else if (tmp->process->used_cycles < tmp->process->cycles) {
 				printf("Proceso %d entra en wait tras %d ciclos \n", tmp->process->pid, tmp->process->used_waits);
-				tmp->process->status = 1;
+				tmp->process->status = WAITING;
 				tmp->process->waiting_time += 1;
 				tmp->process->used_delay += 1;
 			}
 			else {
 				printf("Proceso %d termina tras %d ciclos \n", tmp->process->pid, tmp->process->used_cycles);
-				tmp->process->status = 2;
+				tmp->process->status = FINISHED;
 				enqueue(finished, tmp->process);
 				// tmp2 = finished->head;
 				// while (tmp2 != NULL){
